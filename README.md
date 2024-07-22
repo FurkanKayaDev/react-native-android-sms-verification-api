@@ -1,4 +1,4 @@
-# react-native-android-sms-verification-api
+# @furkan-kaya/react-native-android-sms-verification-api
 
 A wrapper for the Android SMS Verification API. Includes both [SMS Retriever](https://developers.google.com/identity/sms-retriever/overview) for Zero-tap SMS verification and [SMS User Consent](https://developers.google.com/identity/sms-retriever/user-consent/overview) for the One-tap SMS verification
 
@@ -7,7 +7,7 @@ A wrapper for the Android SMS Verification API. Includes both [SMS Retriever](ht
 ## Installation
 
 ```sh
-yarn add react-native-android-sms-verification-api
+yarn add @furkan-kaya/react-native-android-sms-verification-api
 ```
 
 ## Usage
@@ -15,7 +15,7 @@ yarn add react-native-android-sms-verification-api
 ### Requesting the user's phone number
 
 ```js
-import { requestPhoneNumber } from 'react-native-android-sms-verification-api';
+import { requestPhoneNumber } from '@furkan-kaya/react-native-android-sms-verification-api';
 
 try {
   // presents a modal enabling the user to select their phone number. Requires a physical device, it won't work on an emulator
@@ -33,7 +33,7 @@ import {
   startSmsUserConsent,
   requestPhoneNumber,
   removeAllListeners,
-} from 'react-native-android-sms-verification-api';
+} from '@furkan-kaya/react-native-android-sms-verification-api';
 
 // 1. Define a callback that'll receive the message or any errors that occurs
 receiveVerificationSMS((error, message) => {
@@ -69,7 +69,7 @@ To get started
 
 1. Include the library version with the signature helper
 
-   `yarn add https://github.com/jgkiano/react-native-android-sms-verification-api.git#with-signature-helper`
+   `yarn add https://github.com/jgkiano/@furkan-kaya/react-native-android-sms-verification-api.git#with-signature-helper`
 
 2. Change the minSdkVersion of your app to 19 but modifying the `android/build.gradle` file
 
@@ -83,7 +83,7 @@ ext {
 3. Retrive your app's signature
 
 ```js
-import { getAppSignatures } from 'react-native-android-sms-verification-api';
+import { getAppSignatures } from '@furkan-kaya/react-native-android-sms-verification-api';
 
 const [signature] = await getAppSignatures();
 console.log(signature); // e.g FA+9qCX9VSu
@@ -100,7 +100,7 @@ FA+9qCX9VSu
 
 5. Finally remove this version of the library in your project and include the offical release
 
-`yarn remove react-native-android-sms-verification-api && yarn add react-native-android-sms-verification-api`
+`yarn remove @furkan-kaya/react-native-android-sms-verification-api && yarn add @furkan-kaya/react-native-android-sms-verification-api`
 
 #### Usage
 
@@ -109,7 +109,7 @@ import {
   requestPhoneNumber,
   startSmsRetriever,
   receiveVerificationSMS,
-} from 'react-native-android-sms-verification-api';
+} from '@furkan-kaya/react-native-android-sms-verification-api';
 
 // 1. Define a callback that'll receive the message or any errors that occurs
 receiveVerificationSMS((error, message) => {
@@ -139,7 +139,7 @@ See the [contributing guide](CONTRIBUTING.md) to learn how to contribute to the 
 
 ## Documentation
 
-- [API Reference](https://jgkiano.github.io/react-native-android-sms-verification-api/)
+- [API Reference](https://jgkiano.github.io/@furkan-kaya/react-native-android-sms-verification-api/)
 
 ## License
 
