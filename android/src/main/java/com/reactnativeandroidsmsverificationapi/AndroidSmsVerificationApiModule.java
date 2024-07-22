@@ -20,7 +20,6 @@ import com.facebook.react.bridge.WritableNativeArray;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.google.android.gms.auth.api.credentials.Credential;
 import com.google.android.gms.auth.api.credentials.Credentials;
-import com.google.android.gms.auth.api.credentials.HintRequest;
 import com.google.android.gms.auth.api.phone.SmsRetriever;
 import com.google.android.gms.auth.api.phone.SmsRetrieverClient;
 import com.google.android.gms.common.api.CommonStatusCodes;
@@ -42,7 +41,14 @@ public class AndroidSmsVerificationApiModule extends ReactContextBaseJavaModule 
   private final ActivityEventListener activityEventListener = new ActivityEventListener() {
     @Override
     public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data) {
-      handleOnActivityResult(activity, requestCode, resultCode, data);
+      if (requestCode == userConsentRequestCode) {
+            if (resultCode == Activity.RESULT_OK) {
+              String message = data.getStringExtra(SmsRetriever.EXTRA_SMS_MESSAGE);
+              AndroidSmsVerificationApiModule.sendEvent(Constant.SMS_RECEIVED, message);
+            } else {
+              AndroidSmsVerificationApiModule.sendEvent(Constant.SMS_ERROR, "Unable to retrieve SMS");
+            }
+          }
     }
     @Override
     public void onNewIntent(Intent intent) {
@@ -84,25 +90,11 @@ public class AndroidSmsVerificationApiModule extends ReactContextBaseJavaModule 
     this.reactContext = context;
     context.addActivityEventListener(activityEventListener);
     IntentFilter intentFilter = new IntentFilter(SmsRetriever.SMS_RETRIEVED_ACTION);
-    getReactApplicationContext().registerReceiver(smsVerificationReceiver, intentFilter, SmsRetriever.SEND_PERMISSION, null);
-  }
-
-  private void handleOnActivityResult (Activity activity, int requestCode, int resultCode, Intent data) {
-    if (requestCode == userConsentRequestCode) {
-      if (resultCode == Activity.RESULT_OK) {
-        String message = data.getStringExtra(SmsRetriever.EXTRA_SMS_MESSAGE);
-        AndroidSmsVerificationApiModule.sendEvent(Constant.SMS_RECEIVED, message);
-      } else {
-        AndroidSmsVerificationApiModule.sendEvent(Constant.SMS_ERROR, "Unable to retrieve SMS");
-      }
+    if(android.os.Build.VERSION.SDK_INT >= 34 && getReactApplicationContext().getApplicationInfo().targetSdkVersion >= 34){
+        getReactApplicationContext().registerReceiver(smsVerificationReceiver, intentFilter, context.RECEIVER_EXPORTED);
     }
-    if (requestCode == phoneNumberRequestCode && promise != null) {
-      if (resultCode == Activity.RESULT_OK) {
-        Credential credential = data.getParcelableExtra(Credential.EXTRA_KEY);
-        promise.resolve(credential.getId());
-      } else {
-        promise.reject(String.valueOf(resultCode), "Unable to retrieve phone number");
-      }
+    else {
+        getReactApplicationContext().registerReceiver(smsVerificationReceiver, intentFilter, SmsRetriever.SEND_PERMISSION, null);
     }
   }
 
@@ -122,19 +114,6 @@ public class AndroidSmsVerificationApiModule extends ReactContextBaseJavaModule 
   @ReactMethod
   public void multiply (int a, int b, Promise promise) {
     promise.resolve(a*b+5);
-  }
-
-  @ReactMethod
-  public void requestPhoneNumber (int phoneNumberRequestCode, Promise promise) {
-    this.promise = promise;
-    this.phoneNumberRequestCode = phoneNumberRequestCode;
-    HintRequest request = new HintRequest.Builder().setPhoneNumberIdentifierSupported(true).build();
-    PendingIntent intent = Credentials.getClient(getReactApplicationContext()).getHintPickerIntent(request);
-    try {
-      getCurrentActivity().startIntentSenderForResult(intent.getIntentSender(), phoneNumberRequestCode, null, 0, 0, 0);
-    } catch (Exception e) {
-      promise.reject(e);
-    }
   }
 
   @ReactMethod
